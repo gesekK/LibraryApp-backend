@@ -3,8 +3,6 @@ package com.example.technologiesieciowe1.controllers;
 import com.example.technologiesieciowe1.entities.Book;
 import com.example.technologiesieciowe1.entities.Loan;
 import com.example.technologiesieciowe1.entities.User;
-import com.example.technologiesieciowe1.exceptions.BookNotFoundException;
-import com.example.technologiesieciowe1.exceptions.LoanNotFoundException;
 import com.example.technologiesieciowe1.services.BookService;
 import com.example.technologiesieciowe1.services.LoanService;
 import com.example.technologiesieciowe1.services.UserService;
@@ -12,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class LoanController {
     public Loan getLoanById(@PathVariable Long id){
         Loan loan = loanService.getLoanById(id);
         if (loan == null) {
-            throw new BookNotFoundException("Loan with id " + id + " not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan with id " + id + " not found");
         }
         return loan;
     }
@@ -62,7 +61,7 @@ public class LoanController {
         try {
             loanService.returnBook(loanId);
             return ResponseEntity.ok("Book returned successfully.");
-        } catch (LoanNotFoundException e) {
+        } catch (ResponseStatusException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Loan not found.");
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

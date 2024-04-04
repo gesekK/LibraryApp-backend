@@ -45,6 +45,7 @@ public class SecurityConfig {
                                         .requestMatchers("/loan/delayed-returns").hasRole("LIBRARY_EMPLOYEE")
                                         .requestMatchers("/reviews/**").hasAnyRole("LIBRARY_EMPLOYEE","READER")
                                         .requestMatchers("/user/**").hasRole("LIBRARY_EMPLOYEE")
+                                        .requestMatchers("/error").permitAll()
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
