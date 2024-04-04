@@ -2,7 +2,6 @@ package com.example.technologiesieciowe1.controllers;
 
 import com.example.technologiesieciowe1.entities.Loan;
 import com.example.technologiesieciowe1.entities.User;
-import com.example.technologiesieciowe1.exceptions.UserNotFoundException;
 import com.example.technologiesieciowe1.services.LoanService;
 import com.example.technologiesieciowe1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -38,7 +38,7 @@ public class UserController {
     public User getUserById(@PathVariable Long id){
         User user = userService.getUserById(id);
         if (user == null) {
-            throw new UserNotFoundException("User with id " + id + " not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found");
         }
         return user;
     }
@@ -46,7 +46,7 @@ public class UserController {
     public User getUserByUsername(@PathVariable String username) {
         User user = userService.getUserByUsername(username);
         if (user == null) {
-            throw new UserNotFoundException("No users found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found");
         }
         return user;
     }
@@ -54,7 +54,7 @@ public class UserController {
     public User getUserByEmail(@PathVariable String email){
         User user = userService.getUserByEmail(email);
         if (user == null) {
-            throw new UserNotFoundException("No users found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found");
         }
         return user;
     }

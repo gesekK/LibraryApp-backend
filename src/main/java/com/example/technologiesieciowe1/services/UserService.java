@@ -1,7 +1,6 @@
 package com.example.technologiesieciowe1.services;
 
 import com.example.technologiesieciowe1.entities.User;
-import com.example.technologiesieciowe1.exceptions.BookNotFoundException;
 import com.example.technologiesieciowe1.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,18 +22,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-//    public User getCurrentUser() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication != null && authentication.isAuthenticated()) {
-//            Object principal = authentication.getPrincipal();
-//            if (principal instanceof User user) {
-//                return user;
-//            }
-//        }
-//        // Jeśli użytkownik nie jest uwierzytelniony lub informacje o użytkowniku nie są dostępne, rzuć odpowiedni wyjątek
-//        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User is not authenticated or information about user is not available") {
-//        };
-//    }
     public User addUser(User user) {
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User with username " + user.getUsername() + " already exists");
@@ -47,7 +34,7 @@ public class UserService {
     }
     public User getUserById(Long id){
         return userRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException("User with id: " + id + " not found."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id: " + id + " not found."));
     }
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email);
@@ -57,12 +44,12 @@ public class UserService {
     }
     public void deleteUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found"));
         userRepository.delete(user);
     }
     public User updateUser(Long id, User updatedUser){
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException("Book with id: " + id + " not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book with id: " + id + " not found"));
 
         user.setEmail(updatedUser.getEmail());
         user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
@@ -74,7 +61,7 @@ public class UserService {
     }
     public User partiallyUpdateUser(Long id, Map<String, Object> updates){
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found"));
 
         updates.forEach((key, value) -> {
             switch (key) {

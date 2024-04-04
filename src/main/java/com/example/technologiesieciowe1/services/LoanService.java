@@ -3,8 +3,6 @@ package com.example.technologiesieciowe1.services;
 import com.example.technologiesieciowe1.entities.Book;
 import com.example.technologiesieciowe1.entities.Loan;
 import com.example.technologiesieciowe1.entities.User;
-import com.example.technologiesieciowe1.exceptions.BookNotAvailableException;
-import com.example.technologiesieciowe1.exceptions.LoanNotFoundException;
 import com.example.technologiesieciowe1.repositories.BookRepository;
 import com.example.technologiesieciowe1.repositories.LoanRepository;
 import jakarta.transaction.Transactional;
@@ -37,18 +35,18 @@ public class LoanService {
     }
     public Loan getLoanById(Long id){
         return loanRepository.findById(id)
-                .orElseThrow(() -> new LoanNotFoundException("Loan with id " + id + " not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan with id " + id + " not found"));
     }
 
     @Transactional
     public Loan borrowBook(User user, Book book) {
         long unreturnedBooksCount = loanRepository.countByUserAndStatus(user, "borrowed");
         if (unreturnedBooksCount >= 5) {
-            throw new BookNotAvailableException("User has reached the maximum number of borrowed books");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User has reached the maximum number of borrowed books");
         }
 
         if (book.getAvailableCopies() <= 0) {
-            throw new BookNotAvailableException("Book is not available for borrowing");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Book is not available for borrowing");
         }
         Loan loan = new Loan();
         loan.setUser(user);
@@ -67,7 +65,8 @@ public class LoanService {
     }
     @Transactional
     public void approveLoan(Long loanId) {
-        Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException("Loan not found"));
+        Loan loan = loanRepository.findById(loanId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan not found"));
         loan.setStatus("borrowed");
         loanRepository.save(loan);
     }
@@ -75,7 +74,7 @@ public class LoanService {
     @Transactional
     public void confirmReturn(Long loanId) {
         Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new LoanNotFoundException("Loan not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan not found"));
 
         if (!loan.isReturnConfirmed()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Return not confirmed by user");
@@ -99,7 +98,7 @@ public class LoanService {
         Iterable<Loan> loans = loanRepository.findByUserId(userId);
 
         if (!loans.iterator().hasNext()) {
-            throw new LoanNotFoundException("No loan history found for user with ID: " + userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No loan history found for user with ID: " + userId);
         }
 
         return loans;
@@ -113,7 +112,7 @@ public class LoanService {
     @Transactional
     public void returnBook(Long loanId) {
         Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new LoanNotFoundException("Loan not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan not found"));
 
         if (loan.getReturnDate() != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Book has already been returned");

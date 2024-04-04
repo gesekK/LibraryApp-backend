@@ -3,9 +3,6 @@ package com.example.technologiesieciowe1.services;
 import com.example.technologiesieciowe1.entities.Book;
 import com.example.technologiesieciowe1.entities.Review;
 import com.example.technologiesieciowe1.entities.User;
-import com.example.technologiesieciowe1.exceptions.BookNotFoundException;
-import com.example.technologiesieciowe1.exceptions.ReviewNotFoundException;
-import com.example.technologiesieciowe1.exceptions.UserNotFoundException;
 import com.example.technologiesieciowe1.repositories.BookRepository;
 import com.example.technologiesieciowe1.repositories.ReviewRepository;
 import com.example.technologiesieciowe1.repositories.UserRepository;
@@ -40,7 +37,7 @@ public class ReviewService {
             if (reviews.iterator().hasNext()) {
                 return reviews;
             } else {
-                throw new ReviewNotFoundException("No reviews found for the book with title: " + title);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No reviews found for the book with title: " + title);
             }
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Title cannot be null");
@@ -53,7 +50,7 @@ public class ReviewService {
             if (reviews.iterator().hasNext()) {
                 return reviews;
             } else {
-                throw new ReviewNotFoundException("No reviews found for the user with ID: " + userId);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No reviews found for the user with ID: " + userId);
             }
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User ID cannot be null");
@@ -66,9 +63,9 @@ public class ReviewService {
         }
 
         Book book = bookRepository.findById(review.getBook().getId())
-                .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + review.getBook().getId()));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with ID: " + review.getBook().getId()));
         User user = userRepository.findById(review.getUser().getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + review.getUser().getUserId()));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + review.getUser().getUserId()));
 
         review.setBook(book);
         review.setUser(user);

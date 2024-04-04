@@ -2,13 +2,13 @@ package com.example.technologiesieciowe1.controllers;
 
 import com.example.technologiesieciowe1.entities.Book;
 import com.example.technologiesieciowe1.google_books_api.BookDetail;
-import com.example.technologiesieciowe1.exceptions.BookNotFoundException;
 import com.example.technologiesieciowe1.services.BookDetailsService;
 import com.example.technologiesieciowe1.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public class BookController {
     public Book getBookById(@PathVariable Long id){
         Book book = bookService.getBookById(id);
         if (book == null) {
-            throw new BookNotFoundException("Book with id " + id + " not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book with id " + id + " not found");
         }
         return book;
     }
@@ -48,7 +48,7 @@ public class BookController {
     public Iterable<Book> getBooksByAuthor(@PathVariable String author) {
         Iterable<Book> books = bookService.getBooksByAuthor(author);
         if (books == null) {
-            throw new BookNotFoundException("No books found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No books found");
         }
         return books;
     }
@@ -56,7 +56,8 @@ public class BookController {
     public Iterable<Book> getBooksByTitle(@PathVariable String title){
         Iterable<Book> books = bookService.getBooksByTitle(title);
         if (books == null) {
-            throw new BookNotFoundException("No books found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No books found") {
+            };
         }
         return books;
     }

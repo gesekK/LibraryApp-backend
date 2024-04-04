@@ -1,7 +1,6 @@
 package com.example.technologiesieciowe1.services;
 
 import com.example.technologiesieciowe1.entities.Book;
-import com.example.technologiesieciowe1.exceptions.BookNotFoundException;
 import com.example.technologiesieciowe1.repositories.BookRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class BookService {
     }
     public Book getBookById(Long id){
         return bookRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with id: " + id));
     }
     public Iterable<Book> getBooksByAuthor(String author){
         return bookRepository.findByAuthor(author);
@@ -41,12 +40,12 @@ public class BookService {
     }
     public void deleteBookById(Long id) {
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with id: " + id));
         bookRepository.delete(book);
     }
     public Book updateBook(Long id, Book updatedBook){
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException("Book with id: " + id + " not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book with id: " + id + " not found"));
 
         book.setIsbn(updatedBook.getIsbn());
         book.setTitle(updatedBook.getTitle());
@@ -60,7 +59,7 @@ public class BookService {
 
     public Book partiallyUpdateBook(Long id, Map<String, Object> updates){
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with id: " + id));
 
         updates.forEach((key, value) -> {
             switch (key) {
