@@ -50,6 +50,6 @@ public class JWTTokenFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(null);
         }
 
-        filterChain.doFilter(request,response); // musi być za każdym razem na końcu, bo inaczej zapytanie nie zostanie wykonane poprawnie
+        filterChain.doFilter(request,response);
     }
 }

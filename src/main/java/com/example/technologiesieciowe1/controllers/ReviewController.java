@@ -17,7 +17,7 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-    @GetMapping
+    @GetMapping("/getAll")
     public Iterable<Review> getAllReviews() {
         return reviewService.getAllReviews();
     }
@@ -32,7 +32,7 @@ public class ReviewController {
         return reviewService.getReviewsByUser(userId);
     }
 
-    @PostMapping("/addReview")
+    @PostMapping("/add")
     @ResponseStatus(code = HttpStatus.CREATED)
     public Review addReview(@RequestBody Review review) {
         return reviewService.addReview(review);

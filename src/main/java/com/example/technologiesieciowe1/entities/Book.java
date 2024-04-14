@@ -22,7 +22,7 @@ public class Book {
     private  Integer publishYear;
     private Integer availableCopies;
     private long countOfLoans;
-    @Transient // the data field will not be mapped to the database
+    @Transient
     private BookDetail bookDetail;
     @OneToMany(mappedBy = "book")
     private Set<Loan> loans;
