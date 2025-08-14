@@ -1,160 +1,185 @@
-**Project Description**
+# 📚 LibraryApp – Backend
 
-This documentation presents the technical details of the "Library App" project. This project was created to provide functionalities related to managing a book library and user accounts within the system. The application allows for book management, borrowing and returning books, adding reviews, managing users, and provides an API interface for communication.
+## 📌 Overview
+**LibraryApp** is a backend application designed to manage a book library and user accounts.  
+It provides:
+- Book management
+- Borrowing and returning books
+- Adding reviews
+- User account management
+- A REST API for external communication
 
-**Project Objective**
+Built with **Java Spring Boot**, it integrates with **MySQL** and uses **Spring Security** for authentication and authorization.
 
-The objective of the project is to develop a comprehensive system for managing a book library, enabling users to easily browse available books, borrow them, add reviews, and manage user accounts. The application aims to be user-friendly, intuitive, and provide comprehensive library management functionalities.
+---
 
-**Functional Scope**
+## 🚀 Features
 
-The project encompasses the following functionalities:
+### 📖 Book Management
+- Add new books
+- Search books by ID, author, or title
+- Edit book information (full or partial update)
+- Delete books
+- View the 10 most borrowed books
+- Fetch additional details via **Google Books API**
 
+### 👤 User Management
+- User registration & login
+- Account update & deletion
+- View all users or search by ID, username, or email
+- View borrowing history
 
-    * Book Management: Adding, searching, editing, deleting books
-    * User Management: Registration, login, account management
-    * Borrowing and returning books, viewing borrowing history
-    * Adding reviews to books
-    * Providing an API interface for communication with the application
+### 📦 Loan Management
+- Borrow books (reader role)
+- Approve loans (library employee role)
+- Return books
+- View all loans or search by ID
+- View delayed returns
 
-**Technologies Used**
+### 📝 Reviews
+- Add reviews for books
+- View reviews by book title or user ID
 
-The project was implemented using the following technologies and tools:
+---
 
+## 🛠 Technologies Used
+- **Backend:** Java Spring Boot
+- **Database:** MySQL
+- **Build Tool:** Maven
+- **External API:** Google Books API
+- **Security:** Spring Security + JWT
+- **Version Control:** Git
 
-    * Backend: Java Spring Boot
-    * Database: MySQL
-    * Dependency Management: Maven
-    * External API: Google Books API (for obtaining book information)
-    * Security: Spring Security (for user authentication and authorization)
-    * Version Control: Git
-    
-**Directory Structure and Files**
+---
 
-The project consists of the following main parts:
+## 🗄 Database Schema
 
-    -src/main/java: This directory contains all the backend source code written in Java.
-    
-      --com/example/technologiesieciowe1: Main package of the application.
-      
-        -configuration: Configuration for external API.
-        -controllers: Controllers handling HTTP requests.
-        -entities: Entities representing data structures in the database.
-        -repositories: Repository interfaces for data access.
-        -google book api: Representation of external API data structure.
-        -services: Services containing business logic.
-        -security: Security configurations, security filters, JWT Token classes.
-        -src/main/resources: Backend resources such as configuration files, property files.
+### **User**
+| Column   | Type    | Description |
+|----------|---------|-------------|
+| userId   | PK      | User ID |
+| username | String  | Username |
+| password | String  | Hashed password |
+| email    | String  | Email address |
+| role     | String  | ROLE_READER / ROLE_LIBRARY_EMPLOYEE |
+| fullName | String  | Full name |
 
-**Database**
+### **Book**
+| Column          | Type    | Description |
+|-----------------|---------|-------------|
+| id              | PK      | Book ID |
+| isbn            | String  | ISBN number |
+| title           | String  | Title |
+| author          | String  | Author |
+| publisher       | String  | Publisher |
+| publish_year    | Int     | Year of publication |
+| available_copies| Int     | Available copies |
+| count_of_loans  | Int     | Times borrowed |
 
-The project utilizes a relational MySQL database for data storage. The database structure consists of the following tables:
+### **Loan**
+| Column   | Type    | Description |
+|----------|---------|-------------|
+| loanId   | PK      | Loan ID |
+| loanDate | Date    | Loan date |
+| returnDate| Date   | Planned return date |
+| status   | String  | Loan status |
+| userId   | FK      | User who borrowed |
+| bookId   | FK      | Book borrowed |
 
+### **Review**
+| Column   | Type    | Description |
+|----------|---------|-------------|
+| reviewId | PK      | Review ID |
+| content  | String  | Review content |
+| rating   | Int     | Review rating |
+| userId   | FK      | Review author |
+| bookId   | FK      | Reviewed book |
 
-    User Table:
-      * userId: User identifier (primary key)
-      * username: User's username.
-      * password: User's password (hashed).
-      * email: User's email address.
-      * role: User's role in the system (e.g., ROLE READER, ROLE LIBRARY EMPLOYEE).
-      * fullName: User's full name.
+---
 
+## 📌 API Endpoints
 
-    Book Table:
-      * id: Book identifier (primary key).
-      * isbn: Book's ISBN number
-      * title: Book's title.
-      * author: Book's author.
-      * publisher: Book's publisher.
-      * publish year: Book's year of publication. 
-      * available copies: Number of available copies of the book.
-      * count of loans: Number of times the book has been borrowed.
+### 📖 Book Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **POST** | `/book/add` | Add a new book to the library |
+| **GET** | `/book/getAll` | Retrieve a list of all books |
+| **GET** | `/book/{id}` | Get details of a book by its ID |
+| **GET** | `/book/author/{author}` | Search books by author |
+| **GET** | `/book/title/{title}` | Search books by title |
+| **DELETE** | `/book/delete/{id}` | Delete a book by ID |
+| **PATCH** | `/book/update/{id}` | Partially update book information |
+| **PUT** | `/book/update/all/{id}` | Fully update book information |
+| **GET** | `/book/most-borrowed` | Get a list of the 10 most borrowed books |
+| **GET** | `/book/details/{title}` | Retrieve additional book details using **Google Books API** |
 
+---
 
-    Loan Table:
-      * loanId: Loan identifier (primary key).
-      * loanDate: Date of loan.
-      * returnDate: Planned return date.
-      * status: Loan status.
-      * userId: User identifier who borrowed the book (foreign key).
-      * bookId: Book identifier that was borrowed (foreign key).
+### 👤 User Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **POST** | `/login` | Authenticate a user with username and password |
+| **POST** | `/user/logout` | Log out the current user |
+| **POST** | `/user/add` | Register a new user |
+| **GET** | `/user/getAll` | Retrieve a list of all users |
+| **GET** | `/user/{id}` | Get user details by ID |
+| **GET** | `/user/username/{username}` | Search a user by username |
+| **GET** | `/user/email/{email}` | Search a user by email address |
+| **DELETE** | `/user/delete/{id}` | Delete a user by ID |
+| **PATCH** | `/user/update/{id}` | Partially update user data |
+| **PUT** | `/user/update/all/{id}` | Fully update user data |
+| **GET** | `/user/history/{userId}` | Get borrowing history of a specific user |
 
-      
-    Review Table:
-      * reviewId: Review identifier (primary key).
-      * content: Review content.
-      * rating: Review rating.
-      * userId: User identifier who wrote the review (foreign key).
-      * bookId: Book identifier to which the review pertains (foreign key).
+---
 
-**API**
+### 📦 Loan Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **POST** | `/loan/add` | Add a new loan (**ROLE_LIBRARY_EMPLOYEE**) |
+| **GET** | `/loan/getAll` | Retrieve a list of all loans |
+| **GET** | `/loan/{id}` | Get loan details by ID |
+| **POST** | `/loan/borrow` | Borrow a book (**ROLE_READER**) |
+| **PUT** | `/loan/return/{loanId}` | Return a borrowed book |
+| **PUT** | `/loan/approve/{loanId}` | Approve a book loan (**ROLE_LIBRARY_EMPLOYEE**) |
+| **PUT** | `/loan/confirm-return/{loanId}` | Confirm the return of a book (**ROLE_LIBRARY_EMPLOYEE**) |
+| **GET** | `/loan/delayed-returns` | Get a list of delayed book returns |
 
-General Description
+---
 
-An API (Application Programming Interface) is a set of endpoints provided by the server, enabling communication and data exchange between clients and the server. In the case of this project, the API allows clients to perform operations related to book management, user management, loans, and adding reviews.
+### 📝 Reviews
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **POST** | `/reviews/add` | Add a new review for a book |
+| **GET** | `/reviews/getAll` | Retrieve all reviews |
+| **GET** | `/reviews/book/{title}` | Get reviews for a specific book by title |
+| **GET** | `/reviews/user/{userId}` | Get reviews written by a specific user |
+---
 
-    POST /book/add - Adding a new book
-    GET /book/getAll - Viewing all books
-    GET /book/{id} - Searching for a book by id number
-    GET /book/author/{author} - Searching for books by author
-    GET /book/title/{title} - Searching for books by title
-    DELETE /book/delete/{id} - Deleting a book from the database based on id number
-    PATCH /book/update/{id} - Partially updating book data with a specified id
-    PUT /book/update/all/{id} - Fully updating book data with a specified id
-    GET /book/most-borrowed - Displaying a list of the 10 most borrowed books
-    GET /book/details/{title} - Displaying additional information about a book based on the book title
-    
-    
-    POST /login - Logging in a user based on username and password
-    POST /user/logout - Logging out a user
-    POST /user/add - Adding a new user
-    GET /user/getAll - Viewing all users
-    GET /user/{id} - Searching for a user by id number
-    GET /user/username/{username} - Searching for a user by username
-    GET /user/email/{email} - Searching for a user by email address
-    DELETE /user/delete/{id} - Deleting a user from the database based on id number
-    PATCH /user/update/{id} - Partially updating user data with a specified id
-    PUT /user/update/all/{id} - Fully updating user data with a specified id
-    GET /user/history/{userId} - Displaying the borrowing history of a user with a specified id
-    
-    
-    POST /loan/add - Adding a new loan (ROLE LIBRARY EMPLOYEE)
-    GET /loan/getAll - Viewing all loans
-    GET /loan/{id} - Searching for a loan by id number
-    POST /loan/borrow - Adding a new loan (ROLE READER)
-    PUT /loan/return/{loanId} - Returning a borrowed book
-    PUT /loan/approve/{loanId} - Confirming a book loan (ROLE LIBRARY EMPLOYEE)
-    PUT /loan/confirm-return/{loanId} - Confirming the return of a book (ROLE LIBRARY EMPLOYEE)
-    GET /loan/delayed-returns - Displaying a list of delayed book returns
+## 🔒 Security
 
+Implemented with **Spring Security** + **JWT**:
+- **Authentication**: Validates credentials (username & password).
+- **Authorization**: Grants access based on user roles.
+- **JWT Tokens**: Issued upon login, containing user identity & permissions.
 
-    POST /reviews/add - Adding a new review
-    GET /reviews/getAll - Viewing all reviews
-    GET /reviews/book/{title} - Viewing a list of reviews for a book with the specified title
-    GET /reviews/user/{userId} - Viewing a list of reviews written by a user with the specified user ID
+**Security Configuration**: Defined in `SecurityConfig`, including access rules for endpoints and JWT filters.
 
+---
 
+## ⚠ Error Handling
+The application includes:
+- **Validation Errors** – Returned when input data fails validation.
+- **Authentication/Authorization Errors** – Returned when user credentials are invalid or access is denied.
+- **Resource Not Found** – Returned when requested resources are missing.
 
-**Security**
+Error responses are **clear and user-friendly** to ensure good UX.
 
-The project utilizes Spring Security tool to implement mechanisms securing the application. Spring Security provides comprehensive security features such as authentication, authorization, and access to individual functionalities based on JWT token.
+---
 
-**Security Features**
+## 📄 License
+This project is licensed under the MIT License.
 
-    * Authentication: The authentication mechanism verifies the user's identity based on provided authentication credentials, such as username and password.
-    * Authorization: After user authentication, Spring Security checks whether the user has appropriate access permissions to the application resources. Permissions are determined based on user roles.
-    * JWT Technology: JWT tokens are used for authenticating and authorizing users in the application. They are issued after successful authentication and contain information about the user's identity and permissions.
+---
 
-
-**Spring Security Configuration**
-
-The configuration of Spring Security security mechanisms has been performed in the SecurityConfig class, where authentication and authorization rules have been defined. By using Spring Security, the application ensures secure access to resources and protects confidential user data from unauthorized access.
-
-
-**Error Handling**
-
-Various types of errors have been implemented in this application to provide correct and clear messages for users and ensure system stability. Below are the main types of errors and their handling methods:
-
-    * Validation Errors: In case of data sent by the client, the application validates this data. If the data is invalid, an appropriate error message is returned, informing the user about the need to correct the entered data.
-    * Resource Access Errors: If a user tries to access a resource to which they do not have appropriate permissions or if the requested resource does not exist, an appropriate error message is returned along with the relevant HTTP response code.
-    * Uniform Error Response Formatting: All error messages are returned in a uniform format, facilitating their handling on the client side. This formatting includes information about the type of error, HTTP response code, and additional details that may be useful for the user.
+👨‍💻 **Author:** *Katarzyna Gesek*  
+📅 **Version:** 1.0
